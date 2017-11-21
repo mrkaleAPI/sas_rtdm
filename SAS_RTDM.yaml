@@ -1,0 +1,692 @@
+swagger: '2.0'
+info:
+  version: 1.3.0
+  title: SAS_RTDM web service
+  description: >
+    The REST API description provided by SAS Real-Time Decision Manager
+    implemented within the project Channel Optimized Campaign Offers.
+  contact:
+    name: Libor Gabaj
+    url: >-
+      http://infoportal.slsp.sk/portal/iPortal.portal?selectedEmp=431938&_windowLabel=EmpL_OrgTree_1&_pageLabel=EmployeeList
+    email: gabaj.libor@slsp.sk
+host: 'localhost:8080'
+schemes:
+  - https
+basePath: /SASDecisionServices/rest/decisions
+consumes:
+  - application/vnd.sas.decision.request+json
+produces:
+  - application/vnd.sas.decision+json
+  - application/vnd.sas.error+json
+paths:
+  /GetOffers:
+    post:
+      description: >
+        GetOffers service is used for providing personalized content to be
+        presented in specific touchpoint. It is a service with complex
+        functionality.
+      parameters:
+        - name: Request
+          in: body
+          description: Request body
+          required: true
+          schema:
+            $ref: '#/definitions/GetOffersRequest'
+      responses:
+        '201':
+          description: |
+            Synchronous call successful.
+            Error occurred in RTDM flow - ERROR reply used
+          schema:
+            $ref: '#/definitions/GetOffersResponse'
+        default:
+          description: General error response.
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  /SetOfferResponse:
+    post:
+      description: >
+        SetOfferResponse service is used to capture the response of the client
+        for the offer representation in the given touchpoint.
+      parameters:
+        - name: Request
+          in: body
+          description: Request body
+          required: true
+          schema:
+            $ref: '#/definitions/SetOfferResponseRequest'
+      responses:
+        '201':
+          description: |
+            Synchronous call successful.
+            Error occurred in RTDM flow - ERROR reply used
+          schema:
+            $ref: '#/definitions/SetOfferResponseResponse'
+        default:
+          description: General error response.
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  /GetOfferDetails:
+    post:
+      description: >
+        GetOfferDetails service is used to provide information about offer for
+        individual touchpoints. This information will be used for the sales
+        process that is initiated by client based on the offer representation
+        shown.
+      parameters:
+        - name: Request
+          in: body
+          description: Request body
+          required: true
+          schema:
+            $ref: '#/definitions/GetOfferDetailsRequest'
+      responses:
+        '201':
+          description: |
+            Synchronous call successful.
+            Error occurred in RTDM flow - ERROR reply used
+          schema:
+            $ref: '#/definitions/GetOfferDetailsResponse'
+        default:
+          description: General error response.
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+definitions:
+  versionType:
+    description: The media type's schema version number.
+    type: integer
+    default: 1
+    minimum: 1
+    maximum: 1
+  correlationIdType:
+    description: >
+      A string value that is supplied through the decision request and that can
+      be used to correlate the request and the decision that is generated. The
+      engine also uses this string in the log to identify errors or execution
+      trace statements that are associated with the generation of this decision
+      object.
+    type: string
+    default: null
+  OfferRepIdType:
+    description: >
+      Offer representation identifier. It uniquely defines offer (what is beeing
+      offered) and offer representation (how the offer is represented/shown) and
+      for the personalized offers also the client (for who is the offer made).
+    type: string
+  LoanRatingType:
+    type: string
+    enum:
+      - '1'
+      - '2'
+      - '3'
+      - '4'
+      - '5'
+      - '6'
+      - '7'
+      - '8'
+      - '9'
+      - R
+  DataGridData:
+    description: >
+      Contains an ordered collection of values representing the data values of
+      the table, in row major order. For example, the outer collection
+      represents a collection of rows and the inner collection represents a
+      single row of the table. The values in each row must match the type of the
+      columns in the order described in the metadata object.
+    type: object
+    required:
+      - data
+    properties:
+      data:
+        type: array
+        items:
+          type: array
+          items:
+            type: string
+  AdditionalParamsColumns:
+    description: >
+      Contains an ordered collection of column metadata that includes the name
+      and a string representing the type of the column, as described above. The
+      type of the column can be one of the primary types described above. Array
+      types and nested tables are not supported.
+    type: object
+    properties:
+      metadata:
+        type: array
+        minItems: 2
+        maxItems: 2
+        uniqueItems: true
+        items:
+          type: object
+          enum:
+            - type: object
+              description: Name of the additional parameter sent in the request.
+              required:
+                - PName
+              properties:
+                PName:
+                  type: string
+            - type: object
+              description: >-
+                Value (represented as string) of the additional parameter sent
+                in the request.
+              required:
+                - PValue
+              properties:
+                PValue:
+                  type: string
+  OfferRepBaseColumns:
+    type: object
+    description: >
+      Contains an ordered collection of column metadata that includes the name
+      and a string representing the type of the column, as described above. The
+      type of the column can be one of the primary types described above. Array
+      types and nested tables are not supported.
+    properties:
+      metadata:
+        type: array
+        minItems: 4
+        maxItems: 4
+        uniqueItems: true
+        items:
+          type: object
+          enum:
+            - type: object
+              description: >
+                Sequence number of the offer representation, also used as ID of
+                offer representation in this response.
+              required:
+                - 'N'
+              properties:
+                'N':
+                  type: integer
+            - type: object
+              description: Offer representation ID.
+              required:
+                - OfferRepID
+              properties:
+                OfferRepID:
+                  type: string
+            - type: object
+              description: Priority of the offer representation.
+              required:
+                - OfferRepPriority
+              properties:
+                OfferRepPriority:
+                  type: integer
+            - type: object
+              description: Template for the offer representation.
+              required:
+                - TemplateName
+              properties:
+                TemplateName:
+                  type: string
+  OfferRepAttributesColumns:
+    description: >
+      Contains an ordered collection of column metadata that includes the name
+      and a string representing the type of the column, as described above. The
+      type of the column can be one of the primary types described above. Array
+      types and nested tables are not supported.
+    type: object
+    properties:
+      metadata:
+        type: array
+        minItems: 3
+        maxItems: 3
+        uniqueItems: true
+        items:
+          type: object
+          enum:
+            - type: object
+              description: >
+                Sequence number of the offer representation, also used as ID of
+                offer representation in this response.
+              required:
+                - 'N'
+              properties:
+                'N':
+                  type: integer
+            - type: object
+              description: >
+                Name of the offer representation (channel/template specific)
+                attribute (e.g. DetailTitle).
+              required:
+                - AttributeName
+              properties:
+                AttributeName:
+                  type: string
+            - type: object
+              description: >-
+                Value of the offer representation (channel/template specific)
+                attribute.
+              required:
+                - AttributeValue
+              properties:
+                AttributeValue:
+                  type: string
+  RequestHeader:
+    type: object
+    required:
+      - correlationId
+      - version
+      - clientTimeZone
+    properties:
+      correlationId:
+        $ref: '#/definitions/correlationIdType'
+      clientTimeZone:
+        description: >
+          A string that contains the time zone of the client that requests the
+          decision, as defined in the IANA time zone database. This value can be
+          used by the decision flow to evaluate datetime values in the client's
+          time zone for the purpose of generating a decision.
+        type: string
+        default: Europe/Bratislava
+      version:
+        $ref: '#/definitions/versionType'
+  ResponseHeader:
+    type: object
+    required:
+      - correlationId
+      - version
+      - startTimestamp
+      - endTimestamp
+    properties:
+      correlationId:
+        $ref: '#/definitions/correlationIdType'
+      version:
+        $ref: '#/definitions/versionType'
+      startTimestamp:
+        description: Start of the event processing by RTDM.
+        type: string
+        format: date-time
+        example: '2017-01-27T08:11:34.751-05:00'
+      endTimestamp:
+        description: End of the event processing by RTDM.
+        type: string
+        format: date-time
+        example: '2017-01-27T08:11:34.751-05:00'
+  RequestInputs:
+    type: object
+    required:
+      - CID
+      - DID
+    properties:
+      CID:
+        description: Customer Identifier.
+        type: string
+        default: null
+      DID:
+        description: Digital Identifier.
+        type: string
+        default: null
+  ResponseOutputs:
+    type: object
+    required:
+      - ResponseType
+    properties:
+      ResponseType:
+        description: Respose type returned from RTDM flow.
+        type: string
+        enum:
+          - NORMAL
+          - STANDARD
+          - ERROR
+  ErrorResponse:
+    description: >
+      Usable excerption from a universal error structure returned by the
+      SAS_RTDM framework for detected errors and failures.
+    type: object
+    properties:
+      errorCode:
+        description: Internal error code of the mediated system.
+        type: integer
+      message:
+        description: Descriptive reasoning of the error.
+        type: string
+      details:
+        description: Error stack of description of all errors detected.
+        type: array
+        items:
+          type: string
+      httpStatusCode:
+        description: List of possible erroneous HTTP status codes returned by SAS_RTDM.
+        type: integer
+        enum:
+          - 400
+          - 404
+          - 500
+          - 503
+      version:
+        $ref: '#/definitions/versionType'
+  GetOffersRequest:
+    allOf:
+      - $ref: '#/definitions/RequestHeader'
+      - type: object
+        required:
+          - inputs
+        properties:
+          inputs:
+            allOf:
+              - $ref: '#/definitions/RequestInputs'
+              - type: object
+                required:
+                  - ChannelCD
+                  - LanguageCD
+                  - TargetCD
+                  - AdditionalParams
+                properties:
+                  ChannelCD:
+                    description: Channel code.
+                    type: string
+                    enum:
+                      - '2:55'
+                      - '1:59'
+                  LanguageCD:
+                    description: Language code.
+                    type: string
+                    enum:
+                      - sk-SK
+                      - en-US
+                  TargetCD:
+                    description: Target/Page for which the content should be returned.
+                    type: string
+                    enum:
+                      - GHP
+                      - GST
+                      - SHP
+                  AdditionalParams:
+                    description: >-
+                      Additional parameters for the request in SAS datagrid
+                      (table) format.
+                    type: array
+                    default: null
+                    minItems: 2
+                    maxItems: 2
+                    uniqueItems: true
+                    items:
+                      type: object
+                      enum:
+                        - $ref: '#/definitions/AdditionalParamsColumns'
+                        - $ref: '#/definitions/DataGridData'
+  GetOffersResponse:
+    allOf:
+      - $ref: '#/definitions/ResponseHeader'
+      - type: object
+        required:
+          - outputs
+        properties:
+          outputs:
+            allOf:
+              - $ref: '#/definitions/ResponseOutputs'
+              - type: object
+                required:
+                  - NumOfferRepsReturned
+                  - OfferRepBase
+                  - OfferRepAttributes
+                properties:
+                  NumOfferRepsReturned:
+                    description: >-
+                      Number of offer representations returned (may be zero) by
+                      RTDM.
+                    type: integer
+                  OfferRepBase:
+                    description: >
+                      Base characteristics of the returned offers
+                      representations (note that one offer can have more than
+                      one representation) in SAS datagrid (table) format.
+                    type: array
+                    minItems: 2
+                    maxItems: 2
+                    uniqueItems: true
+                    items:
+                      type: object
+                      enum:
+                        - $ref: '#/definitions/OfferRepBaseColumns'
+                        - $ref: '#/definitions/DataGridData'
+                  OfferRepAttributes:
+                    description: >
+                      Detail attributes of the returned offers representations
+                      in SAS datagrid (table) format.
+                    type: array
+                    minItems: 2
+                    maxItems: 2
+                    uniqueItems: true
+                    items:
+                      type: object
+                      enum:
+                        - $ref: '#/definitions/OfferRepAttributesColumns'
+                        - $ref: '#/definitions/DataGridData'
+  SetOfferResponseRequest:
+    allOf:
+      - $ref: '#/definitions/RequestHeader'
+      - type: object
+        required:
+          - inputs
+        properties:
+          inputs:
+            allOf:
+              - $ref: '#/definitions/RequestInputs'
+              - type: object
+                required:
+                  - OfferRepID
+                  - ResponseCD
+                properties:
+                  OfferRepID:
+                    $ref: '#/definitions/OfferRepIdType'
+                  ResponseCD:
+                    description: >
+                      Response code
+
+                      - for buttons correspondes to value of ResponseAction
+                      attribute that is sent in GetOffers.Response for this
+                      button.
+
+                      - in addition ResponseActions attribute values for buttons
+                      ('YES' 'NO' 'LATER') the value of 'VIEWED' is also
+                      supported.
+                    type: string
+  SetOfferResponseResponse:
+    allOf:
+      - $ref: '#/definitions/ResponseHeader'
+      - type: object
+        required:
+          - outputs
+        properties:
+          outputs:
+            $ref: '#/definitions/ResponseOutputs'
+  GetOfferDetailsRequest:
+    allOf:
+      - $ref: '#/definitions/RequestHeader'
+      - type: object
+        required:
+          - inputs
+        properties:
+          inputs:
+            allOf:
+              - $ref: '#/definitions/RequestInputs'
+              - type: object
+                required:
+                  - OfferRepID
+                properties:
+                  OfferRepID:
+                    $ref: '#/definitions/OfferRepIdType'
+  GetOfferDetailsResponse:
+    allOf:
+      - $ref: '#/definitions/ResponseHeader'
+      - type: object
+        required:
+          - outputs
+        properties:
+          outputs:
+            allOf:
+              - $ref: '#/definitions/ResponseOutputs'
+              - type: object
+                required:
+                  - RecommendedAmount
+                  - InterestRatePct
+                  - MonthlyInstalmentAmt
+                  - RecommendedMaturityInMonths
+                  - ProductId
+                  - ProductType
+                  - IncreaseFlag
+                  - ConsolidateFlag
+                  - ContractNumber
+                  - AmtLimit_GL
+                  - LoanRating_GL
+                  - AmtMaxLimit_GL
+                  - AmtMaxInstalmentRec_GL
+                  - CntMaxLoanPeriodMonth_GL
+                  - AmtLimit_STD_A
+                  - LoanRating_STD_A
+                  - AmtMaxLimit_STD_A
+                  - AmtMaxInstalmentRec_STD_A
+                  - CntMaxLoanPeriodMonth_STD_A
+                  - SkipInitialCalculator
+                  - OfferValuesAttr
+                properties:
+                  RecommendedAmount:
+                    description: Recommended offer amount in EUR.
+                    type: number
+                    default: null
+                    format: float
+                  InterestRatePct:
+                    description: Interest rate for the offer in %.
+                    type: number
+                    default: null
+                    format: float
+                    minimum: 0
+                    maximum: 100
+                  MonthlyInstalmentAmt:
+                    description: Monthly installment amount for the offer in EUR.
+                    type: number
+                    default: null
+                    format: float
+                  RecommendedMaturityInMonths:
+                    description: Recommended maturity of the offer in number of months.
+                    type: integer
+                    default: null
+                  ProductId:
+                    description: >-
+                      Product identifier for the offer represented by
+                      'HO_REP_CODE'.
+                    type: string
+                    default: null
+                  ProductType:
+                    description: Category of product.
+                    type: string
+                    default: null
+                    example:
+                      - ConsumerLoan
+                      - Overdraft
+                      - CreditCard
+                      - Mortgage
+                  IncreaseFlag:
+                    description: >
+                      Binary flag indicating if the offer represents increase of
+                      existing limit (logical value true) or new limit/product
+                      (logical value false).
+                    type: boolean
+                    default: null
+                  ConsolidateFlag:
+                    description: >
+                      Binary flag indicating if the offer represents
+                      consolidation offer (logical value true) or not (logical
+                      value false).
+                    type: boolean
+                    default: null
+                  ContractNumber:
+                    description: >
+                      Identifier of the product/account 'ACC_NO' for which the
+                      offer is calculated. Will be filled only if the offer is
+                      referencing existing product/account (and provided by user
+                      in CMT).
+                    type: string
+                    default: null
+                  AmtLimit_GL:
+                    description: >
+                      Amount (in EUR) of guaranteed limit calculated for the
+                      product and client. Will be missing for other offers than
+                      guaranteed limit.
+                    type: number
+                    format: float
+                    default: null
+                  LoanRating_GL:
+                    $ref: '#/definitions/LoanRatingType'
+                  AmtMaxLimit_GL:
+                    description: >
+                      Global maximum amount (in EUR) of guaranteed limit. Will
+                      be missing for other offers than guaranteed limit.
+                    type: number
+                    format: float
+                    default: null
+                  AmtMaxInstalmentRec_GL:
+                    description: >
+                      Recommended installment amount in EUR for guaranteed
+                      limit. Will be missing for other offers than guaranteed
+                      limit.
+                    type: number
+                    format: float
+                    default: null
+                  CntMaxLoanPeriodMonth_GL:
+                    description: >
+                      Maximum loan period in months for consumer loan -
+                      guaranteed limit. Will be missing for other offers than
+                      guaranteed limit or for other offers than consumer loans.
+                    type: integer
+                    default: null
+                  AmtLimit_STD_A:
+                    description: >
+                      Amount (in EUR) of standard limit preapproved
+                      automatically calculated for the product and client. Will
+                      be missing for other offers than guaranteed limit.
+                    type: number
+                    format: float
+                    default: null
+                  LoanRating_STD_A:
+                    $ref: '#/definitions/LoanRatingType'
+                  AmtMaxLimit_STD_A:
+                    description: >
+                      Global maximum amount (in EUR) of standard limit
+                      preapproved automatically. Will be missing for other
+                      offers than guaranteed limit.
+                    type: number
+                    format: float
+                    default: null
+                  AmtMaxInstalmentRec_STD_A:
+                    description: >
+                      Recommended installment amount in EUR for standard limit
+                      preapproved automatically. Will be missing for other
+                      offers than guaranteed limit.
+                    type: number
+                    format: float
+                    default: null
+                  CntMaxLoanPeriodMonth_STD_A:
+                    description: >
+                      Maximum loan period in months for consumer loan - standard
+                      limit preapproved automatically. Will be missing for other
+                      offers than guaranteed limit or for other offers than
+                      consumer loans.
+                    type: integer
+                    default: null
+                  SkipInitialCalculator:
+                    description: >
+                      Binary flag indicating if the offer represents easy
+                      lending process – one-click (logical value true) or
+                      standard loan process (logical value false).
+                    type: boolean
+                    default: false
+                  OfferValuesAttr:
+                    description: >
+                      Detail attributes of the returned offer values
+                      representations (OfferRepID) in SAS datagrid (table)
+                      format.
+                    type: array
+                    minItems: 2
+                    maxItems: 2
+                    uniqueItems: true
+                    items:
+                      type: object
+                      enum:
+                        - $ref: '#/definitions/OfferRepAttributesColumns'
+                        - $ref: '#/definitions/DataGridData'
