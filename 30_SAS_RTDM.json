@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "version": "1.3.0",
-    "title": "SAS_RTDM web service",
+    "title": "30_SAS_RTDM",
     "description": "The REST API description provided by SAS Real-Time Decision Manager implemented within the project Channel Optimized Campaign Offers.\n",
     "contact": {
       "name": "Libor Gabaj",
