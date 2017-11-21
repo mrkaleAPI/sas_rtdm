@@ -44,6 +44,32 @@
           }
         }
       ]
+    },
+    "/test/v1/{parId}": {
+      "get": {
+        "summary": "Search param",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/param"
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "parId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ]
     }
   },
   "components": {
@@ -61,7 +87,8 @@
             "type": "integer"
           }
         }
-      }
+      },
+      "parId": {}
     }
   }
 }
