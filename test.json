@@ -11,6 +11,29 @@
         "summary": "Operation Test",
         "description": "Test operation."
       },
+      "post": {
+        "description": "SetParam",
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/param"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/param"
+              }
+            }
+          }
+        }
+      },
       "parameters": [
         {
           "name": "filter",
@@ -21,6 +44,24 @@
           }
         }
       ]
+    }
+  },
+  "components": {
+    "schemas": {
+      "param": {
+        "required": [
+          "version",
+          "value"
+        ],
+        "properties": {
+          "version": {
+            "type": "string"
+          },
+          "value": {
+            "type": "integer"
+          }
+        }
+      }
     }
   }
 }
